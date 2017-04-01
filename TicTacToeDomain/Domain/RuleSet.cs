@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 
 namespace TicTacToe.Domain {
 
@@ -8,7 +6,7 @@ namespace TicTacToe.Domain {
      * Defaults match the rules of basic TicTacToe.
      */
     public class RuleSet {
-        internal RuleSet() {
+        private RuleSet() {
             this.BoardWidth = 3;
             this.BoardHeight = 3;
             this.MinMovesPerTurn = 1;
@@ -20,6 +18,12 @@ namespace TicTacToe.Domain {
             this.MatchDiagonalLength = 3;
             this.Name = "Classic";
         }
+
+        static RuleSet() {
+            Classic = new RuleSet();
+        }
+
+        public static RuleSet Classic { get; }
 
         public int BoardWidth { get; }
 
@@ -40,40 +44,5 @@ namespace TicTacToe.Domain {
         public int MatchDiagonalLength { get; }
 
         public string Name { get; }
-    }
-
-    public class RuleSets {
-
-        private static RuleSets instance = null;
-
-        private IDictionary<string, RuleSet> ruleSets;
-
-        private RuleSets() {
-            ruleSets = new Dictionary<string, RuleSet>();
-
-            // Configure classic ruleset
-            RuleSet classic = new RuleSet();
-            ruleSets.Add(classic.Name.ToLower(), classic);
-        }
-
-        public static RuleSets Instance {
-            get {
-                if (instance == null) {
-                    instance = new RuleSets();
-                }
-
-                return instance;
-            }
-        }
-
-        public ICollection<string> Available {
-            get {
-                return ruleSets.Keys;
-            }
-        }
-
-        public RuleSet Retrieve(string name) {
-            return ruleSets[name.ToLower()];
-        }
     }
 }
