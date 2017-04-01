@@ -58,7 +58,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Domain\BoardTest.cs" />
+    <Compile Include="Domain\PlayerTest.cs" />
     <Compile Include="Domain\RuleSetTest.cs" />
+    <Compile Include="Domain\TileTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

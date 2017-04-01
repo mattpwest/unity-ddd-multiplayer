@@ -43,7 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Domain\Board.cs" />
+    <Compile Include="Domain\Player.cs" />
     <Compile Include="Domain\RuleSet.cs" />
+    <Compile Include="Domain\Tile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
