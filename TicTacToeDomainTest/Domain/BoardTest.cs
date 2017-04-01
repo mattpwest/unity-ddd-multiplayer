@@ -13,7 +13,8 @@ namespace TicTacToe.Domain {
 
         [TestMethod]
         public void TestRuleSetIsSet() {
-            Board board = new Board(new RuleSet());
+            RuleSet rules = RuleSets.Instance.Retrieve("Classic");
+            Board board = new Board(rules);
 
             Assert.IsNotNull(board.RuleSet);
         }
