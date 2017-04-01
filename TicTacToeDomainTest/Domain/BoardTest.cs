@@ -79,5 +79,105 @@ namespace TicTacToe.Domain {
             var playerThatCanNotJoin = new Player("Player Can Not Join");
             board.Join(playerThatCanNotJoin);
         }
+
+        [TestMethod]
+        public void TestMinPlayersJoinedNotReadyBoardNotReadyToStart() {
+            var board = new Board(RuleSet.Classic);
+
+            for (int i = 1; i <= RuleSet.Classic.MinPlayers; i++) {
+                var player = new Player($"Player {i}");
+
+                board.Join(player);
+            }
+
+            Assert.IsFalse(board.IsReadyToStart);
+        }
+
+        [TestMethod]
+        public void TestMinPlayersJoinedAndReadyBoardIsReadyToStart() {
+            var board = new Board(RuleSet.Classic);
+
+            for (int i = 1; i <= RuleSet.Classic.MinPlayers; i++) {
+                var player = new Player($"Player {i}");
+
+                board.Join(player);
+                player.ToggleReady();
+            }
+
+            Assert.IsTrue(board.IsReadyToStart);
+        }
+
+        [TestMethod]
+        public void TestPlayerJoinedBoardCanLeaveBoard() {
+            var board = new Board(RuleSet.Classic);
+            var player = new Player("Player 1");
+            board.Join(player);
+
+            board.Leave(player);
+
+            Assert.IsFalse(board.Players.Contains(player));
+        }
+
+        [TestMethod]
+        public void TestNotEnoughPlayersReadiedUpIsNotReadyToStart() {
+            var board = new Board(RuleSet.Classic);
+
+            for (int i = 1; i <= RuleSet.Classic.MinPlayers; i++) {
+                var player = new Player($"Player {i}");
+
+                board.Join(player);
+
+                if (i < RuleSet.Classic.MinPlayers) {
+                    player.ToggleReady();
+                }
+            }
+
+            Assert.IsFalse(board.IsReadyToStart);
+        }
+
+        [TestMethod]
+        public void TestNotEnoughPlayersJoinedButReadyBoardIsNotReadyToStart() {
+            var board = new Board(RuleSet.Classic);
+
+            for (int i = 1; i < RuleSet.Classic.MinPlayers; i++) {
+                var player = new Player($"Player {i}");
+
+                board.Join(player);
+
+                player.ToggleReady();
+            }
+
+            Assert.IsFalse(board.IsReadyToStart);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void TestGameNotReadyToStart() {
+            var board = new Board(RuleSet.Classic);
+
+            board.Start();
+        }
+
+        [TestMethod]
+        public void TestGameReadyToStartStartsGame() {
+            var board = new Board(RuleSet.Classic);
+            for (int i = 1; i <= RuleSet.Classic.MinPlayers; i++) {
+                var player = new Player($"Player {i}");
+
+                board.Join(player);
+                player.ToggleReady();
+            }
+
+            board.Start();
+
+            Assert.IsTrue(board.Started);
+        }
+
+        [TestMethod]
+        public void TestNewBoardIsNotStarted() {
+            var board = new Board(RuleSet.Classic);
+
+            Assert.IsFalse(board.Started);
+        }
     }
 }

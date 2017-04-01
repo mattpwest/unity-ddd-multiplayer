@@ -10,5 +10,31 @@ namespace TicTacToe.Domain {
 
             Assert.AreEqual(playerName, player.Name);
         }
+
+        [TestMethod]
+        public void TestNewPlayerIsNotReady() {
+            var player = new Player("TestPlayer");
+
+            Assert.IsFalse(player.Ready);
+        }
+
+        [TestMethod]
+        public void TestNewPlayerToggleReadyIsReady() {
+            var player = new Player("TestPlayer");
+
+            player.ToggleReady();
+
+            Assert.IsTrue(player.Ready);
+        }
+
+        [TestMethod]
+        public void TestReadyPlayerToggleReadyIsNotReady() {
+            var player = new Player("TestPlayer");
+            player.ToggleReady();
+
+            player.ToggleReady();
+
+            Assert.IsFalse(player.Ready);
+        }
     }
 }

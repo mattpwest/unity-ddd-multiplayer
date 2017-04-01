@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TicTacToe.Domain {
     public class Board {
@@ -13,8 +14,15 @@ namespace TicTacToe.Domain {
 
         public bool ReadyToStart => this.players.Count >= this.RuleSet.MinPlayers;
 
+        public bool IsReadyToStart => 
+            this.Players.All(x => x.Ready) &&
+            this.Players.Count() >= this.RuleSet.MinPlayers;
+
+        public bool Started { get; private set; }
+
         private Board() {
             this.players = new Dictionary<string, Player>();
+            this.Started = false;
         }
 
         public Board(RuleSet ruleSet) : this() {
@@ -37,13 +45,25 @@ namespace TicTacToe.Domain {
         public void Join(Player player) {
             if (this.players.Count == this.RuleSet.MaxPlayers) {
                 throw new InvalidOperationException("Cannot join - board is full");
-            }
+            } 
 
             if (this.players.ContainsKey(player.Name)) {
                 throw new InvalidOperationException("Same player may not join again");
             }
 
             this.players.Add(player.Name, player);
+        }
+
+        public void Leave(Player player) {
+            this.players.Remove(player.Name);
+        }
+
+        public void Start() {
+            if (!this.IsReadyToStart) {
+                throw new InvalidOperationException("Game is not ready to start");
+            }
+
+            this.Started = true;
         }
     }
 }
