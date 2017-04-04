@@ -7,6 +7,7 @@ namespace TicTacToe.Domain {
 
         private IDictionary<string, Player> players;
         private Tile[] tiles;
+        private Queue<Player> turnOrder;
 
         public RuleSet RuleSet { get; private set; }
 
@@ -18,11 +19,12 @@ namespace TicTacToe.Domain {
             this.Players.All(x => x.Ready) &&
             this.Players.Count() >= this.RuleSet.MinPlayers;
 
-        public bool Started { get; private set; }
+        public bool Started => this.CurrentPlayer != null;
+
+        public Player CurrentPlayer { get; private set; }
 
         private Board() {
             this.players = new Dictionary<string, Player>();
-            this.Started = false;
         }
 
         public Board(RuleSet ruleSet) : this() {
@@ -63,7 +65,29 @@ namespace TicTacToe.Domain {
                 throw new InvalidOperationException("Game is not ready to start");
             }
 
-            this.Started = true;
+            this.turnOrder = this.GenerateTurnOrder();
+
+            this.CurrentPlayer = this.Players.GetRandom();
+        }
+
+        private Queue<Player> GenerateTurnOrder() {
+            // TODO: Generate random turn order
+            return new Queue<Player>();
+        }
+
+        public void Move(int x, int y) {
+            if (!this.Started) {
+                throw new InvalidOperationException("Cannot move - game has not started yet");
+            }
+
+            var tile = this.GetTile(x, y);
+            tile.Capture(this.CurrentPlayer);
+
+            var currentPlayer = this.CurrentPlayer;
+            var players = this.Players.ToArray();
+            while(currentPlayer == this.CurrentPlayer) {
+                this.CurrentPlayer = this.Players.GetRandom();
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace TicTacToe.Domain {
     [TestClass]
@@ -143,7 +144,6 @@ namespace TicTacToe.Domain {
                 var player = new Player($"Player {i}");
 
                 board.Join(player);
-
                 player.ToggleReady();
             }
 
@@ -160,13 +160,7 @@ namespace TicTacToe.Domain {
 
         [TestMethod]
         public void TestGameReadyToStartStartsGame() {
-            var board = new Board(RuleSet.Classic);
-            for (int i = 1; i <= RuleSet.Classic.MinPlayers; i++) {
-                var player = new Player($"Player {i}");
-
-                board.Join(player);
-                player.ToggleReady();
-            }
+            var board = this.CreateReadyBoard(RuleSet.Classic.MinPlayers);
 
             board.Start();
 
@@ -178,6 +172,106 @@ namespace TicTacToe.Domain {
             var board = new Board(RuleSet.Classic);
 
             Assert.IsFalse(board.Started);
+        }
+
+        [TestMethod]
+        public void TestStartedGameHasCurrentPlayer() {
+            // Given
+            var board = this.CreateReadyBoard(RuleSet.Classic.MinPlayers);
+
+            // When
+            board.Start();
+
+            // Then
+            Assert.IsNotNull(board.CurrentPlayer);
+        }
+
+        [TestMethod]
+        public void TestGameStartedCurrentPlayerIsPlayerThatJoined() {
+
+            // Given
+            var board = this.CreateReadyBoard(RuleSet.Classic.MinPlayers);
+
+            // When
+            board.Start();
+
+            // Then
+            Assert.IsTrue(board.Players.Contains(board.CurrentPlayer));
+        }
+
+        [TestMethod]
+        public void TestGameNotStartedCurrentPlayerIsNull() {
+            // Given
+            var board = this.CreateReadyBoard(RuleSet.Classic.MinPlayers);
+
+            // When
+
+            // Then
+            Assert.IsNull(board.CurrentPlayer);
+        }
+
+        [TestMethod]
+        public void TestTileOwnerChangesOnMove() {
+            // Given
+            Board board = CreateReadyBoard(2);
+            board.Start();
+            Player currentPlayer = board.CurrentPlayer;
+
+            // When
+            board.Move(0, 0);
+
+            // Then
+            Assert.AreEqual(currentPlayer, board.GetTile(0, 0).Owner);
+        }
+        
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void TestGameNotStartedMakeMoveThrowsException() {
+            var board = new Board(RuleSet.Classic);
+
+            board.Move(0, 0);
+        }
+
+        [TestMethod]
+        public void TestWhenMoveIsMadeCurrentPlayerIsChanged() {
+
+            // Given
+            Board board = CreateReadyBoard(2);
+            board.Start();
+            Player currentPlayer = board.CurrentPlayer;
+
+            // When
+            board.Move(0, 0);
+
+            // Then
+            Assert.AreNotEqual(currentPlayer, board.CurrentPlayer);
+        }
+
+        [TestMethod]
+        public void TestWhenMoveIsMadeNextPlayerIsValid() {
+
+            // Given
+            Board board = CreateReadyBoard(2);
+            board.Start();
+            Player currentPlayer = board.CurrentPlayer;
+
+            // When
+            board.Move(0, 0);
+
+            // Then
+            Assert.IsTrue(board.Players.Contains(board.CurrentPlayer));
+        }
+
+        private Board CreateReadyBoard(int maxPlayers) {
+            var board = new Board(RuleSet.Classic);
+            for (int i = 1; i <= maxPlayers; i++) {
+                var player = new Player($"Player {i}");
+
+                board.Join(player);
+                player.ToggleReady();
+            }
+
+            return board;
         }
     }
 }

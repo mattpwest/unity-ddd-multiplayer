@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Domain\Board.cs" />
+    <Compile Include="Domain\EnumberableExtension.cs" />
     <Compile Include="Domain\Player.cs" />
     <Compile Include="Domain\RuleSet.cs" />
     <Compile Include="Domain\Tile.cs" />
