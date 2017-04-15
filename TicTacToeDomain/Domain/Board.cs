@@ -22,9 +22,11 @@ namespace TicTacToe.Domain {
         public bool Started => this.CurrentPlayer != null;
 
         public Player CurrentPlayer { get; private set; }
+        public Player Winner { get; private set; }
 
         private Board() {
             this.players = new Dictionary<string, Player>();
+            this.Winner = null;
         }
 
         public Board(RuleSet ruleSet) : this() {
@@ -67,12 +69,20 @@ namespace TicTacToe.Domain {
 
             this.turnOrder = this.GenerateTurnOrder();
 
-            this.CurrentPlayer = this.Players.GetRandom();
+            NextPlayer();
         }
 
         private Queue<Player> GenerateTurnOrder() {
-            // TODO: Generate random turn order
-            return new Queue<Player>();
+            var order = new Queue<Player>();
+
+            while (order.Count < this.Players.Count()) {
+                var player = this.Players.GetRandom();
+                if (!order.Contains(player)) {
+                    order.Enqueue(player);
+                }
+            }
+
+            return order;
         }
 
         public void Move(int x, int y) {
@@ -83,11 +93,48 @@ namespace TicTacToe.Domain {
             var tile = this.GetTile(x, y);
             tile.Capture(this.CurrentPlayer);
 
-            var currentPlayer = this.CurrentPlayer;
-            var players = this.Players.ToArray();
-            while(currentPlayer == this.CurrentPlayer) {
-                this.CurrentPlayer = this.Players.GetRandom();
+            NextPlayer();
+            
+            CheckForHorizontalWin();
+        }
+
+        private void NextPlayer() {
+            this.CurrentPlayer = this.turnOrder.Dequeue();
+            this.turnOrder.Enqueue(this.CurrentPlayer);
+        }
+
+        private void CheckForHorizontalWin() {
+            for (int y = 0; y < this.RuleSet.BoardHeight; y++) {
+                Player player = null;
+                int matches = 0;
+                for (int x = 0; x < this.RuleSet.BoardWidth; x++) {
+                    var tile = GetTile(x, y);
+                    if (player == null || player != tile.Owner) {
+                        matches = 1;
+                        player = tile.Owner;
+                    } else {
+                        matches++;
+                    }
+
+                    if (matches >= this.RuleSet.MatchHorizontalLength) {
+                        this.Winner = player;
+                        return;
+                    }
+                }
             }
+        }
+
+        public bool IsTie() {
+            int movesAvailable = 0;
+            for (int y = 0; y < this.RuleSet.BoardHeight; y++) {
+                for (int x = 0; x < this.RuleSet.BoardWidth; x++) {
+                    if (GetTile(x, y).Owner == null) {
+                        movesAvailable++;
+                    }
+                }
+            }
+
+            return Winner == null && movesAvailable == 0;
         }
     }
 }

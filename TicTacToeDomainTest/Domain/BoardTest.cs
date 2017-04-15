@@ -223,7 +223,20 @@ namespace TicTacToe.Domain {
             // Then
             Assert.AreEqual(currentPlayer, board.GetTile(0, 0).Owner);
         }
-        
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void TestMoveOnOwnedTileIsInvalid() {
+            // Given
+            Board board = CreateReadyBoard(2);
+            board.Start();
+            Player currentPlayer = board.CurrentPlayer;
+            board.Move(0, 0);
+
+            // When Then
+            board.Move(0, 0);
+        }
+
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestGameNotStartedMakeMoveThrowsException() {
@@ -234,7 +247,6 @@ namespace TicTacToe.Domain {
 
         [TestMethod]
         public void TestWhenMoveIsMadeCurrentPlayerIsChanged() {
-
             // Given
             Board board = CreateReadyBoard(2);
             board.Start();
@@ -249,7 +261,6 @@ namespace TicTacToe.Domain {
 
         [TestMethod]
         public void TestWhenMoveIsMadeNextPlayerIsValid() {
-
             // Given
             Board board = CreateReadyBoard(2);
             board.Start();
@@ -260,6 +271,78 @@ namespace TicTacToe.Domain {
 
             // Then
             Assert.IsTrue(board.Players.Contains(board.CurrentPlayer));
+        }
+
+        [TestMethod]
+        public void TestPlayerOrderAlternatesReliably() {
+            // Given
+            Board board = CreateReadyBoard(2);
+            board.Start();
+
+            // When // Then
+            Player lastPlayer = null;
+
+            for (int y = 0; y < board.RuleSet.BoardHeight; y++) {
+                for (int x = 0; x < board.RuleSet.BoardWidth; x++) {
+                    board.Move(x, y);
+
+                    Assert.AreNotEqual(lastPlayer, board.CurrentPlayer);
+                }
+            }
+        }
+        
+        [TestMethod]
+        public void TestNewGameIsNotDraw() {
+            // Given // When
+            Board board = CreateReadyBoard(2);
+            board.Start();
+
+            // Then
+            Assert.IsFalse(board.IsTie());
+        }
+
+        [TestMethod]
+        public void TestNewGameIsNotWon() {
+            // Given // When
+            Board board = CreateReadyBoard(2);
+            board.Start();
+
+            // Then
+            Assert.IsNull(board.Winner);
+        }
+
+        [TestMethod]
+        public void TestGameCanBeWonWithHorizontalMatch() {
+            // Given
+            Board board = CreateReadyBoard(2);
+            board.Start();
+
+            board.Move(0, 0);
+            board.Move(0, 1);
+            board.Move(1, 0);
+            board.Move(1, 1);
+
+            // When
+            board.Move(2, 0);
+
+            // Then
+            Assert.IsNotNull(board.Winner);
+        }
+
+        [TestMethod]
+        public void TestWonGameIsNotTied() {
+            // Given // When
+            Board board = CreateReadyBoard(2);
+            board.Start();
+
+            board.Move(0, 0);
+            board.Move(0, 1);
+            board.Move(1, 0);
+            board.Move(1, 1);
+            board.Move(2, 0);
+
+            // Then
+            Assert.IsFalse(board.IsTie());
         }
 
         private Board CreateReadyBoard(int maxPlayers) {

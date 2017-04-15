@@ -12,6 +12,10 @@ namespace TicTacToe.Domain {
         public Player Owner { get; private set;  }
 
         internal void Capture(Player player) {
+            if (this.Owner != null) {
+                throw new InvalidOperationException("tile is already captured");
+            }
+
             this.Owner = player;
         }
     }
